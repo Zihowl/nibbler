@@ -132,11 +132,11 @@ let tree_manipulation_props = {
 		// s must be exactly a legal move, including having promotion char iff needed (e.g. e2e1q)
 
 		let next_node_id__initial = next_node_id;
-		let had_null_child = this.node.children.some(c => c.move === "0000");
+		let pruned_null = s !== "0000" && this.node.children.some(c => c.move === "0000" && c.children.length === 0);
 
 		this.node = this.node.make_move(s);
 
-		if (next_node_id !== next_node_id__initial || (had_null_child && s !== "0000")) {
+		if (next_node_id !== next_node_id__initial || pruned_null) {
 			this.tree_version++;
 		}
 
@@ -151,10 +151,13 @@ let tree_manipulation_props = {
 		}
 
 		let next_node_id__initial = next_node_id;
-		let had_null_child = this.node.children.some(c => c.move === "0000");
+		let pruned_null = false;
 
 		let node = this.node;
 		for (let s of moves) {
+			if (s !== "0000" && node.children.some(c => c.move === "0000" && c.children.length === 0)) {
+				pruned_null = true;
+			}
 			node = node.make_move(s);		// Calling the node's make_move() method, not handler's
 		}
 
@@ -162,7 +165,7 @@ let tree_manipulation_props = {
 			this.node = node;
 		}
 
-		if (next_node_id !== next_node_id__initial || (had_null_child && moves[0] !== "0000")) {
+		if (next_node_id !== next_node_id__initial || pruned_null) {
 			this.tree_version++;
 		}
 
