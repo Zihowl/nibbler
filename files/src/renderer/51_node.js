@@ -65,7 +65,9 @@ const node_prototype = {
 
 		if (!force_new_node && s !== "0000") {
 			for (let child of this.children.slice()) {
-				if (child.move === "0000") {
+				// Only prune an empty null leaf. A null branch with children contains
+				// user analysis and must never be destroyed silently.
+				if (child.move === "0000" && child.children.length === 0) {
 					child.detach();
 				}
 			}
