@@ -197,11 +197,6 @@ function LoadPGNRecord(o) {				// This can throw!
 					}
 				}
 
-				if (move === "0000" && node.move === "0000") {
-					DestroyTree(root);
-					throw `"--" -- consecutive null moves not allowed`;
-				}
-
 				node = node.make_move(move, true);
 			}
 		}

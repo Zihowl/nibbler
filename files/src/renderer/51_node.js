@@ -63,6 +63,14 @@ const node_prototype = {
 
 		// s must be exactly a legal move, including having promotion char iff needed (e.g. e2e1q)
 
+		if (s === "0000" && this.move === "0000" && this.parent) {
+			let parent = this.parent;
+			if (this.children.length === 0) {
+				this.detach();
+			}
+			return parent;
+		}
+
 		if (!force_new_node && s !== "0000") {
 			for (let child of this.children.slice()) {
 				// Only prune an empty null leaf. A null branch with children contains

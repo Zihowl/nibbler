@@ -47,9 +47,11 @@ test("PGN import accepts <>", () => {
 	assert.equal(import_pgn(ctx, "1. <> e5 *"), "0000 e7e5");
 });
 
-test("PGN import rejects consecutive null moves", () => {
+test("PGN import cancels consecutive null moves back to the prior node", () => {
 	const ctx = make_context();
-	assert.throws(() => import_pgn(ctx, "1. -- -- *"), /consecutive null/i);
+	assert.equal(import_pgn(ctx, "1. -- -- *"), "");
+	assert.equal(import_pgn(ctx, "1. -- -- e4 *"), "e2e4");
+	assert.equal(import_pgn(ctx, "1. e4 -- -- e5 *"), "e2e4 e7e5");
 });
 
 test("PGN import rejects null move in check", () => {

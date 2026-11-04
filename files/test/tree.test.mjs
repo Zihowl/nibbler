@@ -86,3 +86,36 @@ test("make_move_sequence bumps tree_version when a later step prunes a null", ()
 	`);
 	assert.deepEqual(JSON.parse(JSON.stringify(result)), [1, ["e7e5"]]);
 });
+
+test("consecutive null move on an empty null leaf detaches it and returns to parent", () => {
+	const ctx = make_context();
+	const result = run(ctx, `
+		(() => {
+			${SETUP}
+			let e4 = t.root.make_move("e2e4");
+			t.node = e4;
+			t.make_move("0000");
+			let before = t.tree_version;
+			t.make_move("0000");
+			return [t.node === e4, e4.children.length, t.tree_version - before];
+		})()
+	`);
+	assert.deepEqual(JSON.parse(JSON.stringify(result)), [true, 0, 1]);
+});
+
+test("consecutive null move on a null node with children returns to parent without detaching", () => {
+	const ctx = make_context();
+	const result = run(ctx, `
+		(() => {
+			${SETUP}
+			let e4 = t.root.make_move("e2e4");
+			let n = e4.make_move("0000");
+			n.make_move("d2d4");
+			t.node = n;
+			let before = t.tree_version;
+			t.make_move("0000");
+			return [t.node === e4, e4.children.map(c => c.move), t.tree_version - before];
+		})()
+	`);
+	assert.deepEqual(JSON.parse(JSON.stringify(result)), [true, ["0000"], 0]);
+});

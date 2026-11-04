@@ -1515,12 +1515,13 @@ let hub_props = {
 
 	null_move: function() {
 		let node = this.tree.node;
+		if (node.move === "0000") {
+			this.tree.make_move("0000");
+			this.position_changed(false, true);
+			return true;
+		}
 		if (node.terminal_reason()) {
 			console.log(`hub.null_move() - game is finished (${node.terminal_reason()})`);
-			return false;
-		}
-		if (node.move === "0000") {
-			console.log("hub.null_move() - consecutive null moves not allowed");
 			return false;
 		}
 
