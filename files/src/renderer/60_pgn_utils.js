@@ -175,6 +175,11 @@ function make_movetext(node) {
 	let root = node.get_root();
 	let ordered_nodes = get_ordered_nodes(root, true);
 
+	// A game that is only a null move would otherwise produce no movetext at all.
+	if (ordered_nodes.every(x => typeof x === "string" || x === root)) {
+		ordered_nodes = get_ordered_nodes(root, false);
+	}
+
 	let tokens = [];
 
 	for (let item of ordered_nodes) {
@@ -264,10 +269,9 @@ function __order_nodes(node, list, skip_self_flag, omit_final_nulls = false) {
 	// Handle branching or multiple children...
 
 	let children = node.children;
-	if (omit_final_nulls) {
-		if (children.some(c => c.move === "0000" && c.children.length === 0)) {
-			children = children.filter(c => !(c.move === "0000" && c.children.length === 0));
-		}
+	if (omit_final_nulls && children.length > 1) {
+		// Never drop children[0]: doing so silently promotes a variation to the main line.
+		children = [children[0], ...children.slice(1).filter(c => !(c.move === "0000" && c.children.length === 0))];
 	}
 
 	if (children.length === 0) {
